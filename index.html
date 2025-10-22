@@ -154,18 +154,25 @@
         // Obtener noticias desde RSS
         async function obtenerNoticias() {
             try {
-                // Usamos un servicio proxy para evitar problemas de CORS
-                const rssUrl = 'https://www.cooperativa.cl/noticias/site/tax/port/all/rss_____.xml';
-                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=10`;
+                // Intentar obtener noticias de BioBioChile (más confiable)
+                const rssUrl = 'https://www.biobiochile.cl/rss/';
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
                 
                 const respuesta = await fetch(proxyUrl);
                 const datos = await respuesta.json();
                 
-                if (datos.status === 'ok' && datos.items.length > 0) {
-                    const noticias = datos.items.map(item => item.title);
+                // Parsear el XML
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(datos.contents, 'text/xml');
+                const items = xml.querySelectorAll('item');
+                
+                if (items.length > 0) {
+                    const noticias = Array.from(items).slice(0, 8).map(item => {
+                        return item.querySelector('title').textContent;
+                    });
                     crearTicker(noticias);
+                    console.log('Noticias actualizadas:', noticias.length);
                 } else {
-                    // Si falla, usar noticias por defecto
                     usarNoticiasDefecto();
                 }
             } catch (error) {
