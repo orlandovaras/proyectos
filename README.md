@@ -1,4 +1,4 @@
-# 📺 Dashboard Smart TV - Información Familiar
+# 📺 Dashboard Smart TV - Información útil Familiar  Creación 21-10-2025
 
 Dashboard interactivo diseñado para mostrar información útil en pantallas de Smart TV. Perfecto para mantener a toda la familia informada de un vistazo.
 
@@ -12,9 +12,15 @@ Dashboard interactivo diseñado para mostrar información útil en pantallas de 
 - ⏰ **Reloj en tiempo real** - Hora actualizada segundo a segundo
 - 📅 **Fecha actual** - Mostrada en español con formato completo
 - 🌡️ **Información del clima** - Temperatura, condiciones, humedad y viento
-- 📰 **Ticker de noticias** - Barra deslizante con las últimas noticias
 - 🎨 **Diseño moderno** - Interfaz elegante con efectos glassmorphism
 - 📱 **Responsive** - Se adapta a diferentes tamaños de pantalla
+
+  Versión v1.4 21-10-2025
+
+✅ Noticias actualizadas automáticamente cada 3 horas
+✅ Obtiene las últimas 10 noticias desde Cooperativa.cl
+✅ Sistema de respaldo: Si falla la conexión RSS, usa noticias guardadas
+✅ Sin costos adicionales: Usa un servicio proxy gratuito (rss2json.com)
 
 📊 Resumen de actualizaciones automáticas: Versión 1.4
 
