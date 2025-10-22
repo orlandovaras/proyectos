@@ -46,6 +46,41 @@
             margin-top: 15px;
             opacity: 0.8;
         }
+
+        .noticias-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 0;
+            overflow: hidden;
+        }
+
+        .noticias-ticker {
+            display: flex;
+            white-space: nowrap;
+            animation: deslizar 60s linear infinite;
+        }
+
+        .noticia {
+            padding: 0 50px;
+            font-size: 24px;
+        }
+
+        .separador {
+            color: #3498db;
+            margin: 0 10px;
+        }
+
+        @keyframes deslizar {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
     </style>
 </head>
 <body>
@@ -53,6 +88,12 @@
     <div class="fecha" id="fecha"></div>
     <div class="clima" id="clima">Cargando clima...</div>
     <div class="clima-detalle" id="climaDetalle"></div>
+
+    <div class="noticias-container">
+        <div class="noticias-ticker" id="ticker">
+            <span class="noticia">Cargando noticias...</span>
+        </div>
+    </div>
 
     <script>
         const API_KEY = 'b03dd68736fc417e9b013528252210';
@@ -109,6 +150,60 @@
         
         // Actualizar clima cada 10 minutos
         setInterval(obtenerClima, 600000);
+
+        // Obtener noticias desde RSS
+        async function obtenerNoticias() {
+            try {
+                // Usamos un servicio proxy para evitar problemas de CORS
+                const rssUrl = 'https://www.cooperativa.cl/noticias/site/tax/port/all/rss_____.xml';
+                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=10`;
+                
+                const respuesta = await fetch(proxyUrl);
+                const datos = await respuesta.json();
+                
+                if (datos.status === 'ok' && datos.items.length > 0) {
+                    const noticias = datos.items.map(item => item.title);
+                    crearTicker(noticias);
+                } else {
+                    // Si falla, usar noticias por defecto
+                    usarNoticiasDefecto();
+                }
+            } catch (error) {
+                console.error('Error al obtener noticias:', error);
+                usarNoticiasDefecto();
+            }
+        }
+
+        function usarNoticiasDefecto() {
+            const noticias = [
+                'Tragedia en Recoleta: niño de 10 años fallece tras choque con furgón escolar',
+                'Mundial Sub-20: Marruecos se corona campeón tras vencer a Argentina en el Estadio Nacional',
+                'Universidad de Chile avanza a semifinales de Copa Sudamericana contra Lanús',
+                'Mundial de Ciclismo de Pista se realizará en Peñalolén con 38 delegaciones',
+                'Ibai Llanos anuncia su visita a Chile generando expectativas',
+                'Desierto Florido cubre Atacama y alcanzará su máximo esplendor en octubre'
+            ];
+            crearTicker(noticias);
+        }
+
+        function crearTicker(noticias) {
+            let tickerHTML = '';
+            // Duplicar las noticias para efecto continuo
+            const noticiasDobles = [...noticias, ...noticias];
+            noticiasDobles.forEach((noticia, index) => {
+                tickerHTML += `<span class="noticia">${noticia}</span>`;
+                if (index < noticiasDobles.length - 1) {
+                    tickerHTML += '<span class="separador">●</span>';
+                }
+            });
+            document.getElementById('ticker').innerHTML = tickerHTML;
+        }
+
+        // Inicializar noticias
+        obtenerNoticias();
+        
+        // Actualizar noticias cada 3 horas (10800000 ms)
+        setInterval(obtenerNoticias, 10800000);
     </script>
 </body>
 </html>
