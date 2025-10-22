@@ -16,20 +16,9 @@ Dashboard interactivo diseñado para mostrar información útil en pantallas de 
 - 🎨 **Diseño moderno** - Interfaz elegante con efectos glassmorphism
 - 📱 **Responsive** - Se adapta a diferentes tamaños de pantalla
 
-## 🚀 Demo en Vivo
+📊 Resumen de actualizaciones automáticas: Versión 1.4
 
-Una vez que subas el código a GitHub Pages, tu dashboard estará disponible en:
-```
-https://tu-usuario.github.io/nombre-repositorio
-```
-
-## 📦 Instalación
-
-### Opción 1: GitHub Pages (Hosting gratuito)
-
-1. **Fork o clona este repositorio**
-2. Ve a **Settings** → **Pages**
-3. En **Source**, selecciona la rama `main` o `master`
-4. Haz clic en **Save**
-5. Tu dashboard estará disponible en unos minutos
-
+⏰ Hora: Cada segundo
+📅 Fecha: Al cargar la página
+🌡️ Clima: Cada 10 minutos
+📰 Noticias: Cada 3 horas (y al cargar)
