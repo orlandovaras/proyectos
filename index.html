@@ -35,18 +35,29 @@
             opacity: 0.9;
         }
 
-        .temperatura {
+        .clima {
             font-size: 48px;
             margin-top: 40px;
+            text-align: center;
+        }
+
+        .clima-detalle {
+            font-size: 28px;
+            margin-top: 15px;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="reloj" id="reloj"></div>
     <div class="fecha" id="fecha"></div>
-    <div class="temperatura">Santiago: 19°C</div>
+    <div class="clima" id="clima">Cargando clima...</div>
+    <div class="clima-detalle" id="climaDetalle"></div>
 
     <script>
+        const API_KEY = 'b03dd68736fc417e9b013528252210';
+        const CIUDAD = 'Valparaiso,Chile';
+
         function actualizarReloj() {
             const ahora = new Date();
             const horas = String(ahora.getHours()).padStart(2, '0');
@@ -63,9 +74,41 @@
             document.getElementById('fecha').textContent = fechaTexto.charAt(0).toUpperCase() + fechaTexto.slice(1);
         }
 
+        async function obtenerClima() {
+            try {
+                const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${CIUDAD}&aqi=no`;
+                const respuesta = await fetch(url);
+                
+                if (!respuesta.ok) {
+                    throw new Error(`HTTP error! status: ${respuesta.status}`);
+                }
+                
+                const datos = await respuesta.json();
+                
+                const temperatura = Math.round(datos.current.temp_c);
+                const condicion = datos.current.condition.text;
+                const humedad = datos.current.humidity;
+                const viento = Math.round(datos.current.wind_kph);
+                
+                document.getElementById('clima').textContent = `Valparaíso: ${temperatura}°C`;
+                document.getElementById('climaDetalle').textContent = `${condicion} • Humedad ${humedad}% • Viento ${viento} km/h`;
+            } catch (error) {
+                console.error('Error completo:', error);
+                document.getElementById('clima').textContent = 'Valparaíso: -- °C';
+                document.getElementById('climaDetalle').textContent = '';
+            }
+        }
+
+        // Inicializar
         actualizarReloj();
         actualizarFecha();
+        obtenerClima();
+        
+        // Actualizar reloj cada segundo
         setInterval(actualizarReloj, 1000);
+        
+        // Actualizar clima cada 10 minutos
+        setInterval(obtenerClima, 600000);
     </script>
 </body>
 </html>
