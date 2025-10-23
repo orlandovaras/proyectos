@@ -46,41 +46,6 @@
             margin-top: 15px;
             opacity: 0.8;
         }
-
-        .noticias-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 20px 0;
-            overflow: hidden;
-        }
-
-        .noticias-ticker {
-            display: flex;
-            white-space: nowrap;
-            animation: deslizar 60s linear infinite;
-        }
-
-        .noticia {
-            padding: 0 50px;
-            font-size: 24px;
-        }
-
-        .separador {
-            color: #3498db;
-            margin: 0 10px;
-        }
-
-        @keyframes deslizar {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
-        }
     </style>
 </head>
 <body>
@@ -89,15 +54,66 @@
     <div class="clima" id="clima">Cargando clima...</div>
     <div class="clima-detalle" id="climaDetalle"></div>
 
-    <div class="noticias-container">
-        <div class="noticias-ticker" id="ticker">
-            <span class="noticia">Cargando noticias...</span>
-        </div>
-    </div>
-
     <script>
         const API_KEY = 'b03dd68736fc417e9b013528252210';
         const CIUDAD = 'Valparaiso,Chile';
+
+        // Traducciones de condiciones climáticas
+        const traducciones = {
+            'Partly cloudy': 'Parcialmente nublado',
+            'Cloudy': 'Nublado',
+            'Overcast': 'Cubierto',
+            'Mist': 'Neblina',
+            'Patchy rain possible': 'Posible lluvia dispersa',
+            'Patchy snow possible': 'Posible nieve dispersa',
+            'Patchy sleet possible': 'Posible aguanieve dispersa',
+            'Patchy freezing drizzle possible': 'Posible llovizna helada',
+            'Thundery outbreaks possible': 'Posibles tormentas',
+            'Blowing snow': 'Nieve con viento',
+            'Blizzard': 'Ventisca',
+            'Fog': 'Niebla',
+            'Freezing fog': 'Niebla helada',
+            'Patchy light drizzle': 'Llovizna ligera dispersa',
+            'Light drizzle': 'Llovizna ligera',
+            'Freezing drizzle': 'Llovizna helada',
+            'Heavy freezing drizzle': 'Llovizna helada intensa',
+            'Patchy light rain': 'Lluvia ligera dispersa',
+            'Light rain': 'Lluvia ligera',
+            'Moderate rain at times': 'Lluvia moderada ocasional',
+            'Moderate rain': 'Lluvia moderada',
+            'Heavy rain at times': 'Lluvia intensa ocasional',
+            'Heavy rain': 'Lluvia intensa',
+            'Light freezing rain': 'Lluvia helada ligera',
+            'Moderate or heavy freezing rain': 'Lluvia helada moderada o intensa',
+            'Light sleet': 'Aguanieve ligera',
+            'Moderate or heavy sleet': 'Aguanieve moderada o intensa',
+            'Patchy light snow': 'Nieve ligera dispersa',
+            'Light snow': 'Nieve ligera',
+            'Patchy moderate snow': 'Nieve moderada dispersa',
+            'Moderate snow': 'Nieve moderada',
+            'Patchy heavy snow': 'Nieve intensa dispersa',
+            'Heavy snow': 'Nieve intensa',
+            'Ice pellets': 'Granizo',
+            'Light rain shower': 'Lluvia ligera',
+            'Moderate or heavy rain shower': 'Lluvia moderada o intensa',
+            'Torrential rain shower': 'Lluvia torrencial',
+            'Light sleet showers': 'Aguanieve ligera',
+            'Moderate or heavy sleet showers': 'Aguanieve moderada o intensa',
+            'Light snow showers': 'Nieve ligera',
+            'Moderate or heavy snow showers': 'Nieve moderada o intensa',
+            'Light showers of ice pellets': 'Granizo ligero',
+            'Moderate or heavy showers of ice pellets': 'Granizo moderado o intenso',
+            'Patchy light rain with thunder': 'Lluvia ligera con truenos',
+            'Moderate or heavy rain with thunder': 'Lluvia moderada o intensa con truenos',
+            'Patchy light snow with thunder': 'Nieve ligera con truenos',
+            'Moderate or heavy snow with thunder': 'Nieve moderada o intensa con truenos',
+            'Sunny': 'Soleado',
+            'Clear': 'Despejado'
+        };
+
+        function traducirClima(textoIngles) {
+            return traducciones[textoIngles] || textoIngles;
+        }
 
         function actualizarReloj() {
             const ahora = new Date();
@@ -127,7 +143,8 @@
                 const datos = await respuesta.json();
                 
                 const temperatura = Math.round(datos.current.temp_c);
-                const condicion = datos.current.condition.text;
+                const condicionIngles = datos.current.condition.text;
+                const condicion = traducirClima(condicionIngles);
                 const humedad = datos.current.humidity;
                 const viento = Math.round(datos.current.wind_kph);
                 
@@ -150,57 +167,6 @@
         
         // Actualizar clima cada 10 minutos
         setInterval(obtenerClima, 600000);
-
-        // Obtener noticias desde la función de Netlify
-        async function obtenerNoticias() {
-            try {
-                const url = 'https://sparkling-youtiao-2e086d.netlify.app/.netlify/functions/noticias';
-                const respuesta = await fetch(url);
-                const datos = await respuesta.json();
-                
-                if (datos.success && datos.noticias.length > 0) {
-                    crearTicker(datos.noticias);
-                    console.log('Noticias actualizadas desde Netlify:', datos.noticias.length);
-                } else {
-                    console.log('Usando noticias de respaldo');
-                    usarNoticiasDefecto();
-                }
-            } catch (error) {
-                console.error('Error al obtener noticias:', error);
-                usarNoticiasDefecto();
-            }
-        }
-
-        function usarNoticiasDefecto() {
-            const noticias = [
-                'Tragedia en Recoleta: niño de 10 años fallece tras choque con furgón escolar',
-                'Mundial Sub-20: Marruecos se corona campeón tras vencer a Argentina en el Estadio Nacional',
-                'Universidad de Chile avanza a semifinales de Copa Sudamericana contra Lanús',
-                'Mundial de Ciclismo de Pista se realizará en Peñalolén con 38 delegaciones',
-                'Ibai Llanos anuncia su visita a Chile generando expectativas',
-                'Desierto Florido cubre Atacama y alcanzará su máximo esplendor en octubre'
-            ];
-            crearTicker(noticias);
-        }
-
-        function crearTicker(noticias) {
-            let tickerHTML = '';
-            // Duplicar las noticias para efecto continuo
-            const noticiasDobles = [...noticias, ...noticias];
-            noticiasDobles.forEach((noticia, index) => {
-                tickerHTML += `<span class="noticia">${noticia}</span>`;
-                if (index < noticiasDobles.length - 1) {
-                    tickerHTML += '<span class="separador">●</span>';
-                }
-            });
-            document.getElementById('ticker').innerHTML = tickerHTML;
-        }
-
-        // Inicializar noticias
-        obtenerNoticias();
-        
-        // Actualizar noticias cada 3 horas (10800000 ms)
-        setInterval(obtenerNoticias, 10800000);
     </script>
 </body>
 </html>
